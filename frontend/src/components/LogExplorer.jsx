@@ -1,0 +1,149 @@
+import React, { useState, useEffect } from 'react';
+import { fetchLogs } from '../api/logApi';
+import { Search, Filter, Server, ChevronLeft, ChevronRight } from 'lucide-react';
+
+export default function LogExplorer() {
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [levelFilter, setLevelFilter] = useState('');
+  const [serviceFilter, setServiceFilter] = useState('');
+  
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchLogs({ 
+        limit: 20, 
+        page, 
+        text: searchTerm, 
+        level: levelFilter, 
+        service: serviceFilter 
+      });
+      setLogs(data.logs || []);
+      setTotalPages(data.totalPages || 1);
+      setTotalCount(data.total || 0);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+    const interval = setInterval(loadData, 5000); // Live update
+    return () => clearInterval(interval);
+  }, [page, searchTerm, levelFilter, serviceFilter]);
+
+  return (
+    <div className="animate-fade-in">
+      <div className="header-actions" style={{ marginBottom: '24px' }}>
+        <div>
+          <h1 style={{ fontSize: '28px', marginBottom: '8px' }}>Log Explorer</h1>
+          <p className="text-secondary">Deep dive into real-time application logs ({totalCount} total entries).</p>
+        </div>
+      </div>
+
+      <div className="glass-panel" style={{ padding: '24px', marginBottom: '24px', display: 'flex', gap: '16px', alignItems: 'center' }}>
+        <div style={{ position: 'relative', flex: 1 }}>
+          <Search size={18} style={{ position: 'absolute', left: 14, top: 11, color: '#94a3b8' }} />
+          <input 
+            type="text" 
+            placeholder="Search log messages..." 
+            className="search-input" 
+            style={{ paddingLeft: '40px', width: '100%' }}
+            value={searchTerm}
+            onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
+          />
+        </div>
+        
+        <select 
+          className="search-input" 
+          value={levelFilter} 
+          onChange={(e) => { setLevelFilter(e.target.value); setPage(1); }}
+          style={{ width: '150px' }}
+        >
+          <option value="">All Levels</option>
+          <option value="INFO">INFO</option>
+          <option value="WARN">WARN</option>
+          <option value="ERROR">ERROR</option>
+          <option value="DEBUG">DEBUG</option>
+        </select>
+
+        <select 
+          className="search-input" 
+          value={serviceFilter} 
+          onChange={(e) => { setServiceFilter(e.target.value); setPage(1); }}
+          style={{ width: '200px' }}
+        >
+          <option value="">All Services</option>
+          <option value="auth-service">auth-service</option>
+          <option value="payment-gateway">payment-gateway</option>
+          <option value="user-dashboard">user-dashboard</option>
+          <option value="billing-engine">billing-engine</option>
+          <option value="image-processor">image-processor</option>
+        </select>
+      </div>
+
+      <div className="glass-panel" style={{ padding: '24px' }}>
+         <div className="table-container">
+           <table>
+             <thead>
+               <tr>
+                 <th>Timestamp</th>
+                 <th>Level</th>
+                 <th>Service Process</th>
+                 <th>Log Event Message</th>
+               </tr>
+             </thead>
+             <tbody>
+               {logs.map(log => (
+                 <tr key={log.id || log._id}>
+                   <td className="timestamp">
+                      {new Date(log.timestamp).toLocaleString()}
+                   </td>
+                   <td><span className={`bg-${log.level.toLowerCase()}`}>{log.level}</span></td>
+                   <td className="service-badge"><Server size={14} style={{display:'inline', marginRight:'4px', verticalAlign:'middle'}}/>{log.service}</td>
+                   <td>{log.message}</td>
+                 </tr>
+               ))}
+               {logs.length === 0 && (
+                 <tr>
+                   <td colSpan="4" style={{ textAlign: 'center', opacity: 0.5, padding: '40px' }}>
+                     {loading ? 'Searching...' : 'No logs found matching your criteria.'}
+                   </td>
+                 </tr>
+               )}
+             </tbody>
+           </table>
+         </div>
+
+         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px', color: '#94a3b8' }}>
+            <div>Showing page {page} of {totalPages === 0 ? 1 : totalPages}</div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+               <button 
+                 onClick={() => setPage(p => Math.max(1, p - 1))} 
+                 disabled={page === 1}
+                 className="search-input"
+                 style={{ width: 'auto', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '4px', cursor: page === 1 ? 'not-allowed' : 'pointer', opacity: page === 1 ? 0.5 : 1 }}
+               >
+                 <ChevronLeft size={16} /> Prev
+               </button>
+               <button 
+                 onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
+                 disabled={page === totalPages || totalPages === 0}
+                 className="search-input"
+                 style={{ width: 'auto', padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '4px', cursor: (page === totalPages || totalPages === 0) ? 'not-allowed' : 'pointer', opacity: (page === totalPages || totalPages === 0) ? 0.5 : 1 }}
+               >
+                 Next <ChevronRight size={16} />
+               </button>
+            </div>
+         </div>
+      </div>
+    </div>
+  );
+}
