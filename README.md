@@ -1,77 +1,145 @@
-# DNA Alignment Visualizer & Diagnostic Engine 🧬
+# 🛡️ Mini Splunk: Distributed Log Ingestion & SIEM Command Center
 
-This application is a full-stack bioinformatics tool that uses the **Smith-Waterman dynamic programming algorithm** to align Patient DNA against Reference Genomes. It provides real-time mathematical visualizations and automated clinical diagnosis for genetic diseases.
+This application is a clinical-grade, high-performance **SIEM (Security Information and Event Management) Log Monitoring & Ingestion Dashboard** built on the modern **MERN Stack**. 
+
+It is engineered as a state-of-the-art enterprise security console, demonstrating advanced full-stack competencies, secure failover infrastructure, and high-fidelity interactive UI/UX components.
 
 ---
 
-## 🚀 How to Run the Project from the Beginning
+## 🚀 Key Features
 
-There are two ways to run the project: Native Local Development (Recommended for Development) and Docker (Recommended for Deployment).
+*   **⚡ Real-Time Log Ingestion**: High-throughput REST API endpoint `/api/logs` registers structural JSON server logs in real-time from independent distributed external services.
+*   **🔌 Hybrid Database Failover**: Validates database connectivity and automatically mounts an **In-Memory Sandbox Catalog** if MongoDB is offline, avoiding application crashes.
+*   **🚨 Incident Command Center**: Monitors incoming telemetry streams, matching logs against custom Alert Rules (Admin-only creation/deletion) to auto-trigger incidents.
+*   **🔔 In-App Toast Alerts**: Global polling coordinates with backend endpoints, triggering glowing red sliding warning toast notifications immediately on alert rule validation.
+*   **🤖 Offline AI Chatbot Navigator**: A floating AI chat assistant parses natural language commands completely offline, routing pages and querying active database statistics.
+*   **🔎 Regex Search & Highlight**: Upgraded text explorer supporting raw **Regular Expressions (Regex)**, instantly highlighting substring matches in glowing badges.
+*   **📊 SIEM Network Node Visualizer**: An animated active topology map showing floating responsive nodes (`user-dashboard`, `auth-service`, `image-processor`, `payment-gateway`, `billing-engine`) that pulse blue on activity and flash red on errors. Symmetrically aligned with absolute percentage connections.
+*   **⚙️ Global Theme Accent Selector**: Elegant settings customizer that shifts console visual accents (Splunk Blue, Cyberpunk Amber, Standard Green, Dracula Purple) globally, persisting state via local storage.
+*   **🗑️ Data Retention Policies**: Control panel in Settings allowing operators to prune older database records (wipe all logs, or prune logs older than 5 minutes or 1 hour).
+*   **🔒 Complete Security Shields**:
+    *   **JWT session validation** protecting retrieval and alert channels.
+    *   **BCrypt password hashing** with 10 cryptographic salts.
+    *   **Brute-Force Rate Limiting** restricting login attempts (max 5/minute per IP).
+    *   **Role-Based Access Control (RBAC)** dividing standard Operators (read-only triage) from Admins (full systems authorization).
 
-### Option A: Local Native Setup (Windows/Mac/Linux)
+---
 
-**1. Start the Python Backend**
-The backend requires Python (version 3.9+) to do the heavy mathematical calculations.
+## 🛠️ Technological Stack
+
+*   **Frontend**: React.js, React Router, Recharts, Lucide Icons, Vanilla CSS Glassmorphism
+*   **Backend**: Node.js, Express.js, JWT, BCrypt, Express Rate Limit
+*   **Database**: MongoDB (Mongoose ODM) or In-Memory local array backup
+*   **Streaming**: Concurrent background telemetry thread generator
+
+---
+
+## 📁 System Architecture Directory Map
+
+```text
+├── backend/
+│   ├── config/db.js          # Hybrid DB validation & connection handshake
+│   ├── middleware/
+│   │   ├── authMiddleware.js # JWT Bearer validation & Admin RBAC gates
+│   │   └── rateLimiter.js    # Brute-force auth rate-limiter middleware
+│   ├── models/
+│   │   ├── User.js           # BCrypt hashed User operator schema
+│   │   ├── Incident.js       # Auto-triggered threat incidents schema
+│   │   └── AlertRule.js      # Custom alert rule matrix criteria schema
+│   ├── routes/
+│   │   ├── authRoutes.js     # User registration, login, profile checks
+│   │   ├── alertRoutes.js    # Rules administration and incidents triage
+│   │   └── logRoutes.js      # Logs retrieval, statistics, and retentions
+│   └── server.js             # Core Express server registration & middleware
+├── frontend/
+│   ├── src/
+│   │   ├── api/              # Axios interface instances (authApi, alertApi, logApi)
+│   │   ├── components/
+│   │   │   ├── App.jsx       # Route registration, Toast container, global theme state
+│   │   │   ├── Login.jsx     # SaaS Auth login/register tab panel with success redirect
+│   │   │   ├── Dashboard.jsx # Stat cards, area charts, node visualizer, marquee ticker
+│   │   │   ├── LogExplorer.jsx # Regex search, log data tables, prev/next paginations
+│   │   │   ├── AlertRules.jsx # Incidents command matrix & modal rule establishers
+│   │   │   ├── Settings.jsx  # Retentions pruning console & theme accent selectors
+│   │   │   ├── AboutThis.jsx # Blueprint visualizer & detailed pipeline reviews
+│   │   │   └── ChatAssistant.jsx # Floating offline AI NLP navigator assistant
+│   │   └── index.css         # Cosmic carbon SaaS design stylesheet
+```
+
+---
+
+## 🚀 Installation & Local Setup
+
+### Prerequisite
+*   **Node.js** (version 16+)
+*   **MongoDB** (Optional. Connection is auto-validated; if offline, sandbox database failover takes over automatically).
+
+### Step 1: Start the Backend & Ingestion API
 ```bash
 # Navigate to the backend directory
 cd backend
 
-# Install the required Python packages
-pip install -r requirements.txt
-
-# Start the FastAPI server on port 8000
-python -m uvicorn main:app --reload
-# (Note: On some Windows environments, use `py -m uvicorn ...` or provide full path)
-```
-
-**2. Start the React Frontend**
-The frontend requires Node.js to be installed.
-```bash
-# Open a new terminal and navigate to the frontend directory
-cd frontend
-
-# Install the Node dependencies
+# Install Node dependencies
 npm install
 
-# Start the Vite development server
+# Start the Express server on port 5000
+npm run start
+```
+*   The API server will listen at `http://localhost:5000/`.
+*   Pre-seeded Admin account created automatically:
+    *   **Username**: `admin`
+    *   **Password**: `adminpassword`
+    *   **Role**: `admin`
+
+### Step 2: Start the React Frontend Client
+```bash
+# Open a new terminal in the root and navigate to frontend
+cd frontend
+
+# Install Node dependencies
+npm install
+
+# Start the Vite development client
 npm run dev
 ```
+*   The Vite web client will serve at `http://localhost:5173/`.
 
-**3. Test the App**
-* Open your browser and navigate to `http://localhost:5173/`. Both servers must be running simultaneously.
-
-### Option B: Using Docker (One Command)
-If you have Docker Desktop installed, you do not need to install Python or Node manually.
-
+### Step 3: Run the Telemetry Generator
+To stream simulated microservice logs in real-time:
 ```bash
-# In the root folder of the project, simply run:
-docker-compose up --build
+# Open a new terminal in the root and run the generator
+npm run generator
 ```
-* Access the app at `http://localhost:80/`
+*   *(Alternatively, run `npm run dev:all` in the root to launch Backend, Frontend, and Generator concurrently with one command).*
 
 ---
 
-## ✅ How to Test if the Project is Correct 
+## ✅ Live Verification & Testing Steps
 
-To prove that the Smith-Waterman math is correct and the UI handles scenarios properly, perform the following tests:
+To demonstrate the full capability of the SIEM platform to evaluators, complete the following steps:
 
-### Test 1: The Exact Match (Sanity Check)
-1. Set the **Patient Sequence** to `GATTACA`.
-2. Set the **Reference Sequence** to `GATTACA`.
-3. **Verify:** Look at the heatmap matrix. A perfectly straight, unbroken diagonal line should form from the top-left to the bottom-right. The Clinical Insights panel should turn **Green** and explicitly state: *"No mutations detected."*
-
-### Test 2: The Sickle Cell Substitution (SNP Test)
-1. Click the **"Load Clinical Case Study"** dropdown at the top left.
-2. Select **"Sickle Cell Anemia (HBB SNP)"**.
-3. **Verify:** Notice how the sequence deviates by exactly one letter (`A` substituted for `T`). The matrix will calculate a slightly lower score at that specific junction. The Clinical Insight panel MUST turn **Red** and pop up the specific Sickle Cell Diagnosis report.
-
-### Test 3: The Gap Penalty Enforcement (Indel Test)
-1. Type `ATGCATGC` in both boxes to get a perfect match line.
-2. Delete two letters from the *middle* of the Patient Sequence (e.g., `ATGGC`).
-3. Slide the **Gap Penalty** slider to `-5` (Maximum Penalty).
-4. **Verify:** The dynamic programming algorithm should severely punish the break. The visual "traceback" path on the heatmap will either break completely or take a harsh detour, visually proving that the algorithm punishes Missing Data just like real bioinformatics sequencers do.
-
-### Test 4: FASTA File Upload
-1. Create a raw text file named `test.fasta`. Add a line starting with `>Patient1`, and put `ATCGTACG` on the next line.
-2. Click **"Upload .FASTA"** on the UI and upload your file.
-3. **Verify:** The UI should automatically strip the `>Patient1` metadata header and format the string cleanly into the text box, triggering an immediate recalculation.
+1.  **Authorize Session (Sign-In Redirect)**:
+    *   Navigate to `http://localhost:5173/` and register a new user operator account.
+    *   **Verify:** On clicking submit, notice the flow automatically shifts back to the **Sign In** tab, pre-fills your username, and triggers a glowing green registration success banner.
+    *   Log in with the pre-seeded admin user details (**admin** / **adminpassword**).
+2.  **Symmetric Topology Map & Threat Marquee**:
+    *   Open the **Overview** dashboard.
+    *   **Verify:** Note the perfectly aligned, symmetrically spaced horizontal columns (15%, 50%, 85%) on the topology map. As the background telemetry streams, watch the nodes pulse blue on activity and flash red on errors.
+    *   **Verify:** Observe the chronologically scrolling horizontal ticker marquee cleanly sliding *behind* the static red threat badge at the top.
+3.  **Accent Customization & persistence**:
+    *   Go to **Settings**. Click **Dracula Purple** or **Cyberpunk Amber** under the accent theme chip card.
+    *   **Verify:** All panel borders, settings borders, button glows, and dashboard charts transition instantly. Refresh the browser and verify the theme remains active (persisted in local storage).
+4.  **Database Failover Triage**:
+    *   Review the status card in settings.
+    *   **Verify:** Confirms connection state (Green pulsing dot for Atlas MongoDB, Amber pulsing dot for local offline Sandbox Memory mode).
+5.  **Offline AI Chat Assistant**:
+    *   Click the chatbot trigger at the bottom right.
+    *   Type **`how many logs do we have?`** to query live statistics.
+    *   Type **`what is this project?`** or **`go to settings`**.
+    *   **Verify:** The bot replies and programmatically redirects your browser page route to the respective view in real-time.
+6.  **Regex Substring Highlighter**:
+    *   Navigate to **Log Explorer**. Type a Regular Expression query (e.g., `^Database.*` or specific services).
+    *   **Verify:** Matching text matches are cleanly compiled and highlighted in glowing red/yellow badges inside table rows.
+7.  **Role-Based Access Control (RBAC)**:
+    *   Log out and log in with your newly registered Operator account.
+    *   **Verify:** Navigate to the **Incident Center**. Notice that the **Create Rule** and rule **Trash** icons are disabled, rendering an administrative tooltip lock.
